@@ -1,0 +1,19 @@
+CC = cc
+CFLAGS = -Wall -Werror
+DEBUG_FLAGS = -g
+TARGET = ./build/tetris
+SRCS = $(wildcard src/*.c)
+
+all: $(TARGET)
+
+$(TARGET): $(SRCS)
+	@mkdir -p ./build
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS)
+
+debug: CFLAGS += $(DEBUG_FLAGS)
+debug: $(TARGET)
+
+clean:
+	rm -rf ./build
+
+.PHONY: all debug clean

@@ -1,0 +1,17 @@
+#ifndef RENDER_H
+#define RENDER_H
+
+#include "types.h"
+
+#define OFFSET_X 20
+#define OFFSET_Y 10
+
+#define FG_COLOR 30
+#define BG_COLOR 40
+
+void init_render();
+void render_game(const GameState *state);
+void reset_render();
+void draw_game_over();
+
+#endif

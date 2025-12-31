@@ -1,0 +1,17 @@
+Use double buffering:
+    Framebuffer *next
+    Framebuffer *curr
+    Framebuffer buffers[2]
+
+    We use pointers that point into array, instead of referencing from array directly (then its easier to swap them)
+
+    Use gamestate as current framebuffer
+
+TODO:
+    add shapes
+    piece movement down
+    collision check
+    piece locking
+    input
+    rotation
+
