@@ -38,6 +38,7 @@ static const Vec2 SRS_KICKS_I[TRANSITIONS_COUNT][SRS_KICK_TESTS] = {
     {{0,0}, {-1,0}, {2, 0},  {-1,2},  {2,-1}}, // 0->L
 };
 
+GameState init_gamestate();
 int check_collisions(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, Vec2 new_pos, RotationType new_rotation);
 void lock_piece(Cell board[HEIGHT][WIDTH], ActivePiece *piece);
 int spawn_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece, PieceType type);

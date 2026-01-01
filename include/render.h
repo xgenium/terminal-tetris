@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-#define OFFSET_X 20
-#define OFFSET_Y 10
+#define OFFSET_X 10
+#define OFFSET_Y 5
 
 #define FG_COLOR 30
 #define BG_COLOR 40

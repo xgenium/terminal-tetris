@@ -1,6 +1,25 @@
 #include "../include/logic.h"
 #include <stdlib.h>
-#include <stdio.h>
+
+static void reset_board(Cell board[HEIGHT][WIDTH]);
+
+// Inititialize and GameState with zeroed values
+GameState init_gamestate()
+{
+    GameState state;
+    state.game_over = 0;
+    reset_board(state.board);
+    return state;
+}
+
+static void reset_board(Cell board[HEIGHT][WIDTH])
+{
+    for (int y = 0; y < HEIGHT; y++) {
+	for (int x = 0; x < WIDTH; x++) {
+	    board[y][x] = 0;
+	}
+    }
+}
 
 // returns 1 if collides
 int check_collisions(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, Vec2 new_pos, RotationType new_rotation)

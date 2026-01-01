@@ -7,8 +7,7 @@
 
 int main()
 {
-    GameState state = init_gamestate();
-    init_render();
+    GameState state = init_game();
 
     spawn_piece(state.board, &state.piece, random() % PIECE_COUNT);
     int i = 0;

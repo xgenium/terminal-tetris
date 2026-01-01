@@ -14,6 +14,6 @@
 #define S_TO_MS(S) ((S) * 1000LL)
 
 clock_t get_time_ms();
-GameState init_gamestate();
+GameState init_game();
 
 #endif

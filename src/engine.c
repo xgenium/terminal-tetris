@@ -1,9 +1,12 @@
 #include "../include/engine.h"
-// #include "../include/logic.h"
-// #include "../include/render.h"
+#include "../include/logic.h"
+#include "../include/render.h"
 #include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
 
-static void reset_board(Cell board[HEIGHT][WIDTH]);
+static void sigint_handler(int sig);
+static void init_signal_handler();
 
 clock_t get_time_ms()
 {
@@ -12,22 +15,32 @@ clock_t get_time_ms()
     return S_TO_MS(tp.tv_sec) + NS_TO_MS(tp.tv_nsec);
 }
 
-GameState init_gamestate()
+// Reset colors, show and move cursor to normal position
+// (makes life easier if ctrl c was pressed)
+static void sigint_handler(int sig)
 {
-    GameState state;
-    state.game_over = 0;
-    reset_board(state.board);
-    return state;
+    reset_render();
+    exit(sig);
 }
 
-static void reset_board(Cell board[HEIGHT][WIDTH])
+// Initialize everything
+GameState init_game()
 {
-    for (int y = 0; y < HEIGHT; y++) {
-	for (int x = 0; x < WIDTH; x++) {
-	    board[y][x] = 0;
-	}
-    }
+    init_signal_handler();
+    init_render();
+    // ... add input init
+    return init_gamestate();
 }
+
+// Initialize all signal handlers
+// (use this function in higher lvl function like init_game)
+static void init_signal_handler()
+{
+    struct sigaction sa;
+    sa.sa_handler = &sigint_handler;
+    sigaction(SIGINT, &sa, NULL);
+}
+
 
 /*int main()
 {

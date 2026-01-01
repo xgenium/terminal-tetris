@@ -175,6 +175,7 @@ void render_game(const GameState *state)
     draw_board(state->board, &state->piece);
 }
 
+// Reset colors, show and move cursor to normal position
 void reset_render()
 {
     reset_color();
