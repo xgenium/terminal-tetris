@@ -15,5 +15,7 @@
 
 clock_t get_time_ms();
 GameState init_game();
+void handle_lines(GameState *state);
+void main_loop(GameState *state);
 
 #endif

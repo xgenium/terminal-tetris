@@ -9,6 +9,8 @@
 #define FG_COLOR 30
 #define BG_COLOR 40
 
+#define MAX_ANIMATION_FRAMES 10
+
 void init_render();
 void render_game(const GameState *state);
 void reset_render();

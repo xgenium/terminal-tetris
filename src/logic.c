@@ -1,5 +1,6 @@
 #include "../include/logic.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 static void reset_board(Cell board[HEIGHT][WIDTH]);
 
@@ -8,6 +9,9 @@ GameState init_gamestate()
 {
     GameState state;
     state.game_over = 0;
+
+    // maybe change later to STATE_GAME_START or something
+    // state.current_state = STATE_PLAYING;
     reset_board(state.board);
     return state;
 }
@@ -73,6 +77,72 @@ int spawn_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece, PieceType t
     return 1;
 }
 
+// Find and clear all full lines and add score
+// Returns 1 if clear happened, 0 otherwise
+int handle_full_lines(GameState *state)
+{
+    int lines[HEIGHT], line_count;
+
+    if ((line_count = get_full_lines(state->board, lines)) > 0) {
+	clear_multiple_lines(state->board, lines);
+	// add score based on 'line_count'
+	sleep(1);
+	move_lines(state->board, lines);
+	return 1;
+    }
+    return 0;
+}
+
+void move_lines(Cell board[HEIGHT][WIDTH], const int cleared_lines[HEIGHT])
+{
+    int shift = 0;
+    int cleared_line_idx = 0;
+    // start from the bottom up
+    for (int y = HEIGHT-1; y >= 0; y--)
+	if (cleared_lines[cleared_line_idx] == y) {
+	    shift++;
+	    cleared_line_idx++;
+	} // if we have gaps below us, move this row down
+	else if (shift > 0) {
+	    for (int x = 0; x < WIDTH; x++) {
+		board[y + shift][x] = board[y][x];
+		board[y][x] = 0;
+	    }
+	}
+}
+
+void clear_line(Cell board[HEIGHT][WIDTH], int line)
+{
+    for (int x = 0; x < WIDTH; x++)
+	board[line][x] = 0;
+}
+
+void clear_multiple_lines(Cell board[HEIGHT][WIDTH], const int lines[HEIGHT])
+{
+    for (int i = 0; i < HEIGHT && lines[i] != -1; i++) {
+	clear_line(board, lines[i]);
+    }
+}
+
+// Writes indexes of full lines to lines[] (last index of array is -1);
+// Returns amount of full lines or 0 if no lines were found;
+int get_full_lines(const Cell board[HEIGHT][WIDTH], int lines[HEIGHT])
+{
+    int i = 0;
+    // search from bottom to top
+    for (int row = HEIGHT-1; row >= 0; row--) {
+	int filled_cells = 0;
+	for (int col = 0; col < WIDTH; col++) {
+	    if (board[row][col]) filled_cells++;
+	}
+	if (filled_cells >= WIDTH-1) lines[i++] = row;
+    }
+    // important!!!
+    lines[i] = -1;
+
+    return i;
+}
+
 void game_tick(GameState *state)
 {
     Vec2 new_pos = state->piece.pos;
@@ -81,6 +151,9 @@ void game_tick(GameState *state)
 	state->piece.pos = new_pos;
     } else {
 	lock_piece(state->board, &state->piece);
+	// clear lines before spawning next piece
+	handle_full_lines(state);
+
 	if (!spawn_piece(state->board, &state->piece, random() % PIECE_COUNT))
 	    state->game_over = 1;
     }

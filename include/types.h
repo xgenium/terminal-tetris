@@ -11,6 +11,11 @@ typedef struct {
 } Vec2;
 
 typedef enum {
+    STATE_PLAYING,
+    STATE_ANIMATING
+} State;
+
+typedef enum {
     NONE,
     PIECE_I,
     PIECE_O,
@@ -52,6 +57,8 @@ typedef struct {
     Cell board[HEIGHT][WIDTH];
     ActivePiece piece;
     int8_t game_over;
+    State current_state;
+    uint16_t animation_frame_counter;
     uint32_t score;
 } GameState;
 

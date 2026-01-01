@@ -42,8 +42,12 @@ GameState init_gamestate();
 int check_collisions(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, Vec2 new_pos, RotationType new_rotation);
 void lock_piece(Cell board[HEIGHT][WIDTH], ActivePiece *piece);
 int spawn_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece, PieceType type);
-// create
-void clear_full_lines(GameState *state);
+int handle_full_lines(GameState *state);
+void move_lines(Cell board[HEIGHT][WIDTH], const int cleared_lines[HEIGHT]);
+void clear_line(Cell board[HEIGHT][WIDTH], int line);
+void clear_multiple_lines(Cell board[HEIGHT][WIDTH], const int lines[HEIGHT]);
+int get_full_lines(const Cell board[HEIGHT][WIDTH], int lines[HEIGHT]);
+//
 uint32_t update_score(uint32_t score, uint8_t lines);
 //
 void game_tick(GameState *state);

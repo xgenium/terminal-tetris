@@ -41,6 +41,25 @@ static void init_signal_handler()
     sigaction(SIGINT, &sa, NULL);
 }
 
+// TODO: IMPROVE
+// void handle_lines(GameState *state)
+// {
+//     int lines[HEIGHT];
+//     if (state->current_state == STATE_PLAYING) {
+// 	if (handle_full_lines(state, lines)) {
+// 	    state->current_state = STATE_ANIMATING;
+// 	    state->animation_frame_counter = 0;
+// 	}
+// 	game_tick(state);
+//     } else if (state->current_state == STATE_ANIMATING) {
+// 	state->animation_frame_counter++;
+// 	if (state->animation_frame_counter >= MAX_ANIMATION_FRAMES) {
+// 	    move_lines(state->board, lines);
+// 	    state->current_state = STATE_PLAYING;
+// 	}
+//     }
+// }
+
 
 /*int main()
 {
