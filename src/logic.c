@@ -77,16 +77,42 @@ int spawn_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece, PieceType t
     return 1;
 }
 
+// Move right if direction is positive or left if negative;
+// if direction == 0: do nothing
+void move_piece_horizontal(const Cell board[HEIGHT][WIDTH], ActivePiece *piece, int direction)
+{
+    if (direction == 0) return;
+
+    Vec2 new_pos = piece->pos;
+
+    if (direction > 0) new_pos.x++;
+    else new_pos.x--;
+
+    if (!check_collisions(board, piece, new_pos, piece->rotation))
+	piece->pos = new_pos;
+}
+
+void rotate_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece)
+{
+    RotationType new_rot = (piece->rotation + 1) % ROTATION_COUNT;
+    Vec2 new_pos;
+    if (try_wall_kick(board, piece, new_rot, &new_pos)) {
+	piece->rotation = new_rot;
+	piece->pos = new_pos;
+    }
+}
+
 // Find and clear all full lines and add score
 // Returns 1 if clear happened, 0 otherwise
 int handle_full_lines(GameState *state)
 {
+    // maybe move to engine.c
     int lines[HEIGHT], line_count;
 
     if ((line_count = get_full_lines(state->board, lines)) > 0) {
 	clear_multiple_lines(state->board, lines);
 	// add score based on 'line_count'
-	sleep(1);
+	// change state to animation
 	move_lines(state->board, lines);
 	return 1;
     }
@@ -135,7 +161,7 @@ int get_full_lines(const Cell board[HEIGHT][WIDTH], int lines[HEIGHT])
 	for (int col = 0; col < WIDTH; col++) {
 	    if (board[row][col]) filled_cells++;
 	}
-	if (filled_cells >= WIDTH-1) lines[i++] = row;
+	if (filled_cells >= WIDTH) lines[i++] = row;
     }
     // important!!!
     lines[i] = -1;
@@ -157,6 +183,7 @@ void game_tick(GameState *state)
 	if (!spawn_piece(state->board, &state->piece, random() % PIECE_COUNT))
 	    state->game_over = 1;
     }
+
 }
 
 Vec2 get_shape_bit_pos(uint16_t shape, int bit_index, Vec2 piece_pos)

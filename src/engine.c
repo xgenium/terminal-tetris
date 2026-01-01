@@ -1,9 +1,11 @@
 #include "../include/engine.h"
 #include "../include/logic.h"
 #include "../include/render.h"
+#include "../include/input.h"
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static void sigint_handler(int sig);
 static void init_signal_handler();
@@ -20,6 +22,7 @@ clock_t get_time_ms()
 static void sigint_handler(int sig)
 {
     reset_render();
+    reset_input();
     exit(sig);
 }
 
@@ -28,6 +31,7 @@ GameState init_game()
 {
     init_signal_handler();
     init_render();
+    init_input();
     // ... add input init
     return init_gamestate();
 }
@@ -41,25 +45,34 @@ static void init_signal_handler()
     sigaction(SIGINT, &sa, NULL);
 }
 
-// TODO: IMPROVE
-// void handle_lines(GameState *state)
-// {
-//     int lines[HEIGHT];
-//     if (state->current_state == STATE_PLAYING) {
-// 	if (handle_full_lines(state, lines)) {
-// 	    state->current_state = STATE_ANIMATING;
-// 	    state->animation_frame_counter = 0;
-// 	}
-// 	game_tick(state);
-//     } else if (state->current_state == STATE_ANIMATING) {
-// 	state->animation_frame_counter++;
-// 	if (state->animation_frame_counter >= MAX_ANIMATION_FRAMES) {
-// 	    move_lines(state->board, lines);
-// 	    state->current_state = STATE_PLAYING;
-// 	}
-//     }
-// }
-
+// Handles input and sets tick to MIN_TICK if down
+// arrow key is pressed
+void handle_input(GameState *state)
+{
+    unsigned char buf[INPUT_BUF_SIZE];
+    int n;
+    // NOTE: change this later
+    state->tick = DEFAULT_TICK;
+    while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
+	InputType input = parse_input(buf);
+	switch (input) {
+	    case LEFT:
+		move_piece_horizontal(state->board, &state->piece, -1);
+		break;
+	    case RIGHT:
+		move_piece_horizontal(state->board, &state->piece, 1);
+		break;
+	    case DOWN:
+		state->tick = MIN_TICK;
+		break;
+	    case ROTATE:
+		rotate_piece(state->board, &state->piece);
+		break;
+	    case UNKNOWN: default:
+		break;
+	}
+    }
+}
 
 /*int main()
 {

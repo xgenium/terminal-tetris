@@ -3,6 +3,7 @@
 #include "../include/engine.h"
 #include <stdint.h>
 #include <unistd.h>
+#include <time.h>
 
 int main()
 {
@@ -14,13 +15,22 @@ int main()
 	    state.board[y][x] = (x != 5) ? 1 : 0;
 	}
     }
+    clock_t last_time = get_time_ms();
 
-    while (!state.game_over) {
-	// handle_lines(&state);
+    while (1) {
+	clock_t current_time = get_time_ms();
+
+	handle_input(&state);
+
+	if (current_time - last_time >= state.tick) {
+	    game_tick(&state);
+	    last_time = current_time;
+	}
+
 	render_game(&state);
-	game_tick(&state);
-	usleep(MS_TO_MICROS(200));
+	usleep(MS_TO_MICROS(FRAMERATE_CAP));
     }
+    return 0;
     draw_game_over();
     reset_render();
     return 0;

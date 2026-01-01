@@ -45,6 +45,14 @@ typedef enum {
     ROTATION_COUNT
 } RotationType;
 
+typedef enum {
+    RIGHT,
+    LEFT,
+    DOWN,
+    ROTATE,
+    UNKNOWN
+} InputType;
+
 typedef PieceType Cell;
 
 typedef struct {
@@ -56,8 +64,9 @@ typedef struct {
 typedef struct {
     Cell board[HEIGHT][WIDTH];
     ActivePiece piece;
-    int8_t game_over;
-    State current_state;
+    int8_t game_over; // use current_state instead
+    int16_t tick;
+    // State current_state;
     uint16_t animation_frame_counter;
     uint32_t score;
 } GameState;
