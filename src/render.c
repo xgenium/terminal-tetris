@@ -19,6 +19,7 @@ static void compose_frame(const Cell board[HEIGHT][WIDTH], const ActivePiece *pi
 static void render_cell(Cell cell);
 static void render_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece);
 static void render_outline();
+static void render_hud(int16_t lines_cleared, int8_t level);
 // TODO:
 // static void render_score(uint32_t score);
 
@@ -141,6 +142,7 @@ static void render_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *pie
 		// for each x in board there is 2 chars in output
 		move_cursor(OFFSET_X + x*2, OFFSET_Y + y);
 		set_fg_color(get_color_by_type(current));
+		set_bg_color(BLACK);
 		render_cell(current);
 		shadow_buffer[y][x] = current;
 	    }
@@ -170,9 +172,22 @@ static void render_outline()
     fflush(stdout);
 }
 
+void render_hud(int16_t lines_cleared, int8_t level)
+{
+    set_bg_color(WHITE);
+    set_fg_color(BLACK);
+
+    move_cursor(OFFSET_X + WIDTH * 2 + 1, OFFSET_Y);
+    printf("Lines cleared: %d", lines_cleared);
+
+    move_cursor(OFFSET_X + WIDTH * 2 + 1, OFFSET_Y + OFFSET_Y/2);
+    printf("Level: %d", level);
+}
+
 void render_game(const GameState *state)
 {
     render_board(state->board, &state->piece);
+    render_hud(state->total_lines_cleared, state->level);
 }
 
 // Reset colors, show and move cursor to normal position

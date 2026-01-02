@@ -10,6 +10,10 @@ GameState init_gamestate()
     GameState state;
     state.game_over = 0;
     state.pressed_keys = 0;
+    state.total_lines_cleared = 0;
+    state.level = 1;
+
+    state.tick = DEFAULT_TICK;
 
     // maybe change later to STATE_GAME_START or something
     // state.current_state = STATE_PLAYING;
@@ -109,8 +113,8 @@ void rotate_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece)
 }
 
 // Find and clear all full lines and add score
-// Returns 1 if clear happened, 0 otherwise
-int handle_full_lines(GameState *state)
+// Returns amount of cleared lines
+int8_t handle_full_lines(GameState *state)
 {
     int lines[HEIGHT], line_count;
 
@@ -119,9 +123,8 @@ int handle_full_lines(GameState *state)
 	// add score based on 'line_count'
 	// change state to animation
 	move_lines(state->board, lines);
-	return 1;
     }
-    return 0;
+    return line_count;
 }
 
 void move_lines(Cell board[HEIGHT][WIDTH], const int cleared_lines[HEIGHT])
@@ -174,8 +177,10 @@ int get_full_lines(const Cell board[HEIGHT][WIDTH], int lines[HEIGHT])
     return i;
 }
 
-void game_tick(GameState *state)
+// Returns amount of lines cleared
+int8_t game_tick(GameState *state)
 {
+    int8_t lines_cleared = 0;
     Vec2 new_pos = state->piece.pos;
     new_pos.y++;
 
@@ -185,12 +190,13 @@ void game_tick(GameState *state)
     } else if (collision_type == 1) { // lock piece only if active piece collides with locked pieces
 	lock_piece(state->board, &state->piece);
 	// clear lines before spawning next piece
-	handle_full_lines(state);
+	lines_cleared = handle_full_lines(state);
 
 	// Make sure not to spawn NONE, or bad things will happen
 	if (!spawn_piece(state->board, &state->piece, get_random_piece_type()))
 	    state->game_over = 1;
     }
+    return lines_cleared;
 }
 
 Vec2 get_shape_bit_pos(uint16_t shape, int bit_index, Vec2 piece_pos)
@@ -253,3 +259,9 @@ PieceType get_random_piece_type()
 {
     return (random() % (PIECE_COUNT - 1)) + 1;
 }
+
+int8_t get_level_by_lines_cleared(int lines_cleared)
+{
+    return 1 + lines_cleared / LINES_PER_LEVEL;
+}
+

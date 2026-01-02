@@ -6,6 +6,8 @@
 #define WIDTH 10 // board width
 #define HEIGHT 20 // board height
 
+#define MAX_LEVEL 10
+
 typedef struct {
     int8_t x, y;
 } Vec2;
@@ -23,7 +25,8 @@ typedef enum {
 } PieceType;
 
 typedef enum {
-    RED = 1, // Z
+    BLACK = 0,
+    RED, // Z
     GREEN, // S
     YELLOW, // O
     BLUE, // J
@@ -60,9 +63,10 @@ typedef struct {
     Cell board[HEIGHT][WIDTH];
     ActivePiece piece;
     int8_t game_over;
-    int16_t tick;
     int8_t pressed_keys;
-    uint32_t score;
+    int8_t level;
+    int16_t tick;
+    int total_lines_cleared;
 } GameState;
 
 static const uint16_t PIECE_SHAPES[PIECE_COUNT][ROTATION_COUNT] = {

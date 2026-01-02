@@ -4,6 +4,12 @@
 #define TRANSITIONS_COUNT 8
 #define SRS_KICK_TESTS 5
 
+#define DEFAULT_TICK 500       // 500 ms
+#define MIN_TICK 30	      // 30 ms
+#define TICKS_PER_LEVEL 40
+
+#define LINES_PER_LEVEL 10
+
 #define SPAWN_X 3
 #define SPAWN_Y 0
 
@@ -44,15 +50,16 @@ void lock_piece(Cell board[HEIGHT][WIDTH], ActivePiece *piece);
 int spawn_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece, PieceType type);
 void move_piece_horizontal(const Cell board[HEIGHT][WIDTH], ActivePiece *piece, int direction);
 void rotate_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece);
-int handle_full_lines(GameState *state);
+int8_t handle_full_lines(GameState *state);
 void move_lines(Cell board[HEIGHT][WIDTH], const int cleared_lines[HEIGHT]);
 void clear_line(Cell board[HEIGHT][WIDTH], int line);
 void clear_multiple_lines(Cell board[HEIGHT][WIDTH], const int lines[HEIGHT]);
 int get_full_lines(const Cell board[HEIGHT][WIDTH], int lines[HEIGHT]);
-void game_tick(GameState *state);
+int8_t game_tick(GameState *state);
 Vec2 get_shape_bit_pos(uint16_t shape, int bit_index, Vec2 piece_pos);
 int try_wall_kick(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, RotationType new_rot, Vec2 *out_pos);
 int get_transition_index(RotationType old_rot, RotationType new_rot);
 PieceType get_random_piece_type();
+int8_t get_level_by_lines_cleared(int lines_cleared);
 
 #endif

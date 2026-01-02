@@ -2,14 +2,21 @@
 #include "../include/logic.h"
 #include "../include/render.h"
 #include "../include/input.h"
+#include <stdint.h>
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
 
+static uint16_t get_tick_by_level(int8_t level);
 static void sigint_handler(int sig);
 static void init_signal_handler();
 static void apply_input(GameState *state, InputType input);
+
+static uint16_t get_tick_by_level(int8_t level)
+{
+    return DEFAULT_TICK - level * TICKS_PER_LEVEL;
+}
 
 clock_t get_time_ms()
 {
@@ -76,6 +83,10 @@ static void apply_input(GameState *state, InputType input)
 // Processes up to 2 pressed_keys and reset all pressed_keys
 void process_movement(GameState *state)
 {
+    // reset tick rate
+    if (state->tick == MIN_TICK)
+	state->tick = get_tick_by_level(state->level);
+
     int applied = 0;
     for (int shift = 0; shift < MOVEMENT_COUNT && applied <= MAX_PRESSED_KEYS; shift++) {
 	InputType type = 1<<shift;
@@ -92,8 +103,6 @@ void handle_input(GameState *state)
 {
     unsigned char buf[INPUT_BUF_SIZE];
     int n;
-    // NOTE: change this later
-    state->tick = DEFAULT_TICK;
     while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
 
 	// Parse multiple keys
@@ -107,6 +116,11 @@ void handle_input(GameState *state)
     }
 }
 
+void handle_leveling(GameState *state)
+{
+    state->level = get_level_by_lines_cleared(state->total_lines_cleared);
+}
+
 void main_loop(GameState *state)
 {
     clock_t last_time = get_time_ms();
@@ -118,7 +132,11 @@ void main_loop(GameState *state)
 	process_movement(state);
 
 	if (current_time - last_time >= state->tick) {
-	    game_tick(state);
+	    int8_t lines_cleared = game_tick(state);
+	    if (lines_cleared > 0) {
+		state->total_lines_cleared += lines_cleared;
+		handle_leveling(state);
+	    }
 	    last_time = current_time;
 	}
 
