@@ -112,7 +112,6 @@ void rotate_piece(const Cell board[HEIGHT][WIDTH], ActivePiece *piece)
 // Returns 1 if clear happened, 0 otherwise
 int handle_full_lines(GameState *state)
 {
-    // maybe move to engine.c
     int lines[HEIGHT], line_count;
 
     if ((line_count = get_full_lines(state->board, lines)) > 0) {
@@ -189,8 +188,7 @@ void game_tick(GameState *state)
 	handle_full_lines(state);
 
 	// Make sure not to spawn NONE, or bad things will happen
-	PieceType new_type = (random() % (PIECE_COUNT - 1)) + 1;
-	if (!spawn_piece(state->board, &state->piece, new_type))
+	if (!spawn_piece(state->board, &state->piece, get_random_piece_type()))
 	    state->game_over = 1;
     }
 }
@@ -227,10 +225,9 @@ int try_wall_kick(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, Rot
 
 int get_transition_index(RotationType old_rot, RotationType new_rot)
 {
-    int transition_idx;
+    int transition_idx = 0;
     // dont touch
     switch (old_rot) {
-	case ROTATION_COUNT: // dont handle
 	case R_DEFAULT:
 	    if (new_rot == R_CLOCKWISE) transition_idx = 0;
 	    if (new_rot == R_ANTI_CLOCKWISE) transition_idx = 7;
@@ -247,6 +244,12 @@ int get_transition_index(RotationType old_rot, RotationType new_rot)
 	    if (new_rot == R_REVERSE) transition_idx = 5;
 	    if (new_rot == R_DEFAULT) transition_idx = 6;
 	    break;
+	default: break;
     }
     return transition_idx;
+}
+
+PieceType get_random_piece_type()
+{
+    return (random() % (PIECE_COUNT - 1)) + 1;
 }

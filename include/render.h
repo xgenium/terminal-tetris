@@ -14,6 +14,6 @@
 void init_render();
 void render_game(const GameState *state);
 void reset_render();
-void draw_game_over();
+void render_game_over();
 
 #endif

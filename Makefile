@@ -1,9 +1,11 @@
 CC = cc
 CFLAGS = -Wall -Werror
-DEBUG_FLAGS = -g3
+DEBUG_FLAGS = -g3 -Og
+RELEASE_FLAGS = -O3
 TARGET = ./build/tetris
 SRCS = $(wildcard src/*.c)
 
+all: CFLAGS += $(RELEASE_FLAGS)
 all: $(TARGET)
 
 $(TARGET): $(SRCS)

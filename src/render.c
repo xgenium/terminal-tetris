@@ -16,11 +16,11 @@ static void hide_cursor();
 static void show_cursor();
 static void move_cursor(int8_t x, int8_t y);
 static void compose_frame(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, Cell frame[HEIGHT][WIDTH]);
-static void draw_cell(Cell cell);
-static void draw_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece);
-static void draw_outline();
+static void render_cell(Cell cell);
+static void render_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece);
+static void render_outline();
 // TODO:
-// static void draw_score(uint32_t score);
+// static void render_score(uint32_t score);
 
 static void init_shadow_buffer()
 {
@@ -37,7 +37,7 @@ void init_render()
     hide_cursor();
     set_color_mode();
     init_shadow_buffer();
-    draw_outline();
+    render_outline();
 }
 
 static void clear_screen()
@@ -120,14 +120,14 @@ static void compose_frame(const Cell board[HEIGHT][WIDTH], const ActivePiece *pi
     }
 }
 
-static void draw_cell(Cell cell) {
+static void render_cell(Cell cell) {
     if (cell == 0)
 	printf("  ");
     else
 	printf("[]");
 }
 
-static void draw_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece)
+static void render_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece)
 {
     Cell temp_buffer[HEIGHT][WIDTH];
     compose_frame(board, piece, temp_buffer);
@@ -141,7 +141,7 @@ static void draw_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece
 		// for each x in board there is 2 chars in output
 		move_cursor(OFFSET_X + x*2, OFFSET_Y + y);
 		set_fg_color(get_color_by_type(current));
-		draw_cell(current);
+		render_cell(current);
 		shadow_buffer[y][x] = current;
 	    }
 	}
@@ -149,7 +149,7 @@ static void draw_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece
     fflush(stdout);
 }
 
-static void draw_outline()
+static void render_outline()
 {
     for (int x = 0; x < WIDTH*2; x++) {
 	// top
@@ -172,7 +172,7 @@ static void draw_outline()
 
 void render_game(const GameState *state)
 {
-    draw_board(state->board, &state->piece);
+    render_board(state->board, &state->piece);
 }
 
 // Reset colors, show and move cursor to normal position
@@ -185,7 +185,7 @@ void reset_render()
     fflush(stdout);
 }
 
-void draw_game_over()
+void render_game_over()
 {
     move_cursor(OFFSET_X + WIDTH/2, OFFSET_Y + HEIGHT/2);
     set_fg_color(WHITE);

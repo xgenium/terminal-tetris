@@ -32,14 +32,16 @@ void reset_all()
     reset_input();
 }
 
-// Initialize everything
+// Initialize everything and spawn a piece
 GameState init_game()
 {
     init_signal_handler();
     init_render();
     init_input();
     // ... add input init
-    return init_gamestate();
+    GameState state = init_gamestate();
+    spawn_piece(state.board, &state.piece, get_random_piece_type());
+    return state;
 }
 
 // Initialize all signal handlers
@@ -105,21 +107,22 @@ void handle_input(GameState *state)
     }
 }
 
-/*int main()
+void main_loop(GameState *state)
 {
     clock_t last_time = get_time_ms();
-    clock_t accumulator = 0;
-    GameState state;
 
-    while (1) {
+    while (!state->game_over) {
 	clock_t current_time = get_time_ms();
-	if (current_time - last_time >= FALL_SPEED) {
-	    game_tick(&state);
+
+	handle_input(state);
+	process_movement(state);
+
+	if (current_time - last_time >= state->tick) {
+	    game_tick(state);
 	    last_time = current_time;
 	}
 
-	render_game(&state);
+	render_game(state);
 	usleep(MS_TO_MICROS(FRAMERATE_CAP));
     }
-    return 0;
-}*/
+}

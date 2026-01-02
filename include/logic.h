@@ -49,12 +49,10 @@ void move_lines(Cell board[HEIGHT][WIDTH], const int cleared_lines[HEIGHT]);
 void clear_line(Cell board[HEIGHT][WIDTH], int line);
 void clear_multiple_lines(Cell board[HEIGHT][WIDTH], const int lines[HEIGHT]);
 int get_full_lines(const Cell board[HEIGHT][WIDTH], int lines[HEIGHT]);
-//
-uint32_t update_score(uint32_t score, uint8_t lines);
-//
 void game_tick(GameState *state);
 Vec2 get_shape_bit_pos(uint16_t shape, int bit_index, Vec2 piece_pos);
 int try_wall_kick(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, RotationType new_rot, Vec2 *out_pos);
 int get_transition_index(RotationType old_rot, RotationType new_rot);
+PieceType get_random_piece_type();
 
 #endif
