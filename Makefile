@@ -1,6 +1,6 @@
 CC = cc
 CFLAGS = -Wall -Werror
-DEBUG_FLAGS = -g
+DEBUG_FLAGS = -g3
 TARGET = ./build/tetris
 SRCS = $(wildcard src/*.c)
 

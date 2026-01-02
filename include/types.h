@@ -46,11 +46,11 @@ typedef enum {
 } RotationType;
 
 typedef enum {
-    RIGHT,
-    LEFT,
-    DOWN,
-    ROTATE,
-    UNKNOWN
+    UNKNOWN = 0,
+    RIGHT = 1<<0,
+    LEFT = 1<<1,
+    DOWN = 1<<2,
+    ROTATE = 1<<3
 } InputType;
 
 typedef PieceType Cell;
@@ -66,8 +66,8 @@ typedef struct {
     ActivePiece piece;
     int8_t game_over; // use current_state instead
     int16_t tick;
+    int8_t pressed_keys;
     // State current_state;
-    uint16_t animation_frame_counter;
     uint32_t score;
 } GameState;
 

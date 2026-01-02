@@ -3,10 +3,10 @@
 
 #include "types.h"
 
-#define INPUT_BUF_SIZE 3
+#define ARROW_KEY_SIZE 3
 
 void init_input();
-InputType parse_input(unsigned char buf[INPUT_BUF_SIZE]);
+int parse_input(unsigned char buf[ARROW_KEY_SIZE], InputType *type);
 void reset_input();
 
 #endif

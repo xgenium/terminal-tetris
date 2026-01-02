@@ -9,7 +9,7 @@ static void init_shadow_buffer();
 static void set_color_mode();
 static void set_fg_color(uint8_t color);
 static void set_bg_color(uint8_t color);
-static void reset_color();
+static void reset_colors();
 static uint8_t get_color_by_type(PieceType type);
 static void hide_cursor();
 // static void reset_cursor();
@@ -51,7 +51,7 @@ static void set_color_mode()
     printf("\033[=1h");
 }
 
-static void reset_color()
+static void reset_colors()
 {
     printf("\033[0m");
 }
@@ -178,7 +178,7 @@ void render_game(const GameState *state)
 // Reset colors, show and move cursor to normal position
 void reset_render()
 {
-    reset_color();
+    reset_colors();
     // Move cursor after game board + offset_y
     move_cursor(1, OFFSET_Y*2 + HEIGHT);
     show_cursor();
@@ -188,6 +188,7 @@ void reset_render()
 void draw_game_over()
 {
     move_cursor(OFFSET_X + WIDTH/2, OFFSET_Y + HEIGHT/2);
+    set_fg_color(WHITE);
     set_bg_color(RED);
     printf("GAME OVER");
 }

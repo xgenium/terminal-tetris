@@ -9,6 +9,7 @@ GameState init_gamestate()
 {
     GameState state;
     state.game_over = 0;
+    state.pressed_keys = 0;
 
     // maybe change later to STATE_GAME_START or something
     // state.current_state = STATE_PLAYING;
@@ -25,17 +26,22 @@ static void reset_board(Cell board[HEIGHT][WIDTH])
     }
 }
 
-// returns 1 if collides with locked piece; 2 if with bounds
+// returns 1 if collides with locked piece or floor; 2 if with walls
 int check_collisions(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, Vec2 new_pos, RotationType new_rotation)
 {
+    if (piece->type == NONE) return 0; // make sure piece isnt NONE
     uint16_t shape = PIECE_SHAPES[piece->type][new_rotation];
     for (int i = 0; i < 16; i++) {
 	if (shape & (0x8000 >> i)) {
 	    Vec2 bit_pos = get_shape_bit_pos(shape, i, new_pos);
 
-	    // check wall/floor bounds
-	    if (bit_pos.x < 0 || bit_pos.x >= WIDTH || bit_pos.y >= HEIGHT)
+	    // check wall bounds
+	    if (bit_pos.x < 0 || bit_pos.x >= WIDTH)
 		return 2;
+
+	    // check floor bounds
+	    if (bit_pos.y >= HEIGHT)
+		return 1;
 
 	    // board collision with locked pieces
 	    // NOTE: y < 0 is for spawning pieces at the top
@@ -173,6 +179,7 @@ void game_tick(GameState *state)
 {
     Vec2 new_pos = state->piece.pos;
     new_pos.y++;
+
     int8_t collision_type;
     if (!(collision_type = check_collisions(state->board, &state->piece, new_pos, state->piece.rotation))) {
 	state->piece.pos = new_pos;
@@ -181,10 +188,11 @@ void game_tick(GameState *state)
 	// clear lines before spawning next piece
 	handle_full_lines(state);
 
-	if (!spawn_piece(state->board, &state->piece, random() % PIECE_COUNT))
+	// Make sure not to spawn NONE, or bad things will happen
+	PieceType new_type = (random() % (PIECE_COUNT - 1)) + 1;
+	if (!spawn_piece(state->board, &state->piece, new_type))
 	    state->game_over = 1;
     }
-
 }
 
 Vec2 get_shape_bit_pos(uint16_t shape, int bit_index, Vec2 piece_pos)

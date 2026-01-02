@@ -17,10 +17,11 @@ int main()
     }
     clock_t last_time = get_time_ms();
 
-    while (1) {
+    while (!state.game_over) {
 	clock_t current_time = get_time_ms();
 
 	handle_input(&state);
+	process_movement(&state);
 
 	if (current_time - last_time >= state.tick) {
 	    game_tick(&state);
@@ -30,8 +31,7 @@ int main()
 	render_game(&state);
 	usleep(MS_TO_MICROS(FRAMERATE_CAP));
     }
-    return 0;
     draw_game_over();
-    reset_render();
+    reset_all();
     return 0;
 }

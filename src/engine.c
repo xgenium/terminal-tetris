@@ -9,6 +9,7 @@
 
 static void sigint_handler(int sig);
 static void init_signal_handler();
+static void apply_input(GameState *state, InputType input);
 
 clock_t get_time_ms()
 {
@@ -21,9 +22,14 @@ clock_t get_time_ms()
 // (makes life easier if ctrl c was pressed)
 static void sigint_handler(int sig)
 {
+    reset_all();
+    exit(sig);
+}
+
+void reset_all()
+{
     reset_render();
     reset_input();
-    exit(sig);
 }
 
 // Initialize everything
@@ -45,8 +51,41 @@ static void init_signal_handler()
     sigaction(SIGINT, &sa, NULL);
 }
 
-// Handles input and sets tick to MIN_TICK if down
-// arrow key is pressed
+static void apply_input(GameState *state, InputType input)
+{
+    switch (input) {
+	case LEFT:
+	    move_piece_horizontal(state->board, &state->piece, -1);
+	    break;
+	case RIGHT:
+	    move_piece_horizontal(state->board, &state->piece, 1);
+	    break;
+	case DOWN:
+	    state->tick = MIN_TICK;
+	    break;
+	case ROTATE:
+	    rotate_piece(state->board, &state->piece);
+	    break;
+	case UNKNOWN: default:
+	    break;
+    }
+}
+
+// Processes up to 2 pressed_keys and reset all pressed_keys
+void process_movement(GameState *state)
+{
+    int applied = 0;
+    for (int shift = 0; shift < MOVEMENT_COUNT && applied <= MAX_PRESSED_KEYS; shift++) {
+	InputType type = 1<<shift;
+	if (state->pressed_keys & type) {
+	    apply_input(state, type);
+	}
+    }
+    // reset all pressed keys
+    state->pressed_keys = 0;
+}
+
+// Sets pressed_keys up to 2 currently pressed keys
 void handle_input(GameState *state)
 {
     unsigned char buf[INPUT_BUF_SIZE];
@@ -54,22 +93,14 @@ void handle_input(GameState *state)
     // NOTE: change this later
     state->tick = DEFAULT_TICK;
     while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
-	InputType input = parse_input(buf);
-	switch (input) {
-	    case LEFT:
-		move_piece_horizontal(state->board, &state->piece, -1);
-		break;
-	    case RIGHT:
-		move_piece_horizontal(state->board, &state->piece, 1);
-		break;
-	    case DOWN:
-		state->tick = MIN_TICK;
-		break;
-	    case ROTATE:
-		rotate_piece(state->board, &state->piece);
-		break;
-	    case UNKNOWN: default:
-		break;
+
+	// Parse multiple keys
+	for (int i = 0; i < n; i++) {
+	    InputType type;
+	    int parsed_bytes = 0;
+	    parsed_bytes = parse_input(&buf[i], &type);
+	    state->pressed_keys |= type;
+	    if (parsed_bytes > 0) i += (parsed_bytes - 1);
 	}
     }
 }
