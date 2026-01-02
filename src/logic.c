@@ -25,17 +25,17 @@ static void reset_board(Cell board[HEIGHT][WIDTH])
     }
 }
 
-// returns 1 if collides
+// returns 1 if collides with locked piece; 2 if with bounds
 int check_collisions(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece, Vec2 new_pos, RotationType new_rotation)
 {
-    uint16_t shape = PIECE_SHAPES[piece->type][piece->rotation];
+    uint16_t shape = PIECE_SHAPES[piece->type][new_rotation];
     for (int i = 0; i < 16; i++) {
 	if (shape & (0x8000 >> i)) {
 	    Vec2 bit_pos = get_shape_bit_pos(shape, i, new_pos);
 
 	    // check wall/floor bounds
 	    if (bit_pos.x < 0 || bit_pos.x >= WIDTH || bit_pos.y >= HEIGHT)
-		return 1;
+		return 2;
 
 	    // board collision with locked pieces
 	    // NOTE: y < 0 is for spawning pieces at the top
@@ -173,9 +173,10 @@ void game_tick(GameState *state)
 {
     Vec2 new_pos = state->piece.pos;
     new_pos.y++;
-    if (!check_collisions(state->board, &state->piece, new_pos, state->piece.rotation)) {
+    int8_t collision_type;
+    if (!(collision_type = check_collisions(state->board, &state->piece, new_pos, state->piece.rotation))) {
 	state->piece.pos = new_pos;
-    } else {
+    } else if (collision_type == 1) { // lock piece only if active piece collides with locked pieces
 	lock_piece(state->board, &state->piece);
 	// clear lines before spawning next piece
 	handle_full_lines(state);
