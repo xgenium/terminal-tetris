@@ -86,8 +86,7 @@ void process_movement(GameState *state)
     // reset tick rate
     state->tick = get_tick_by_level(state->level);
 
-    int applied = 0;
-    for (int shift = 0; shift < MOVEMENT_COUNT && applied <= MAX_PRESSED_KEYS; shift++) {
+    for (int shift = 0; shift < MOVEMENT_COUNT; shift++) {
 	InputType type = 1<<shift;
 	if (state->pressed_keys & type) {
 	    apply_input(state, type);
