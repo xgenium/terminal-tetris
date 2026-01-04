@@ -43,6 +43,7 @@ void reset_all()
 GameState init_game()
 {
     init_signal_handler();
+    srandom(time(NULL));
     init_render();
     init_input();
     // ... add input init
