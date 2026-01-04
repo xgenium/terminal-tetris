@@ -102,14 +102,12 @@ void handle_input(GameState *state)
     unsigned char buf[INPUT_BUF_SIZE];
     int n;
     while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
-
+	int parsed_bytes = 0;
 	// Parse multiple keys
-	for (int i = 0; i < n; i++) {
+	for (int i = 0; i < n; i += parsed_bytes) {
 	    InputType type;
-	    int parsed_bytes = 0;
 	    parsed_bytes = parse_input(&buf[i], &type);
 	    state->pressed_keys |= type;
-	    if (parsed_bytes > 0) i += (parsed_bytes - 1);
 	}
     }
 }
