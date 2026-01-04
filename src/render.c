@@ -26,9 +26,9 @@ static void render_hud(int16_t lines_cleared, int8_t level);
 static void init_shadow_buffer()
 {
     for (int y = 0; y < HEIGHT; y++) {
-	for (int x = 0; x < WIDTH; x++) {
-	    shadow_buffer[y][x] = 0;
-	}
+        for (int x = 0; x < WIDTH; x++) {
+            shadow_buffer[y][x] = 0;
+        }
     }
 }
 
@@ -70,14 +70,14 @@ static void set_bg_color(uint8_t color)
 static uint8_t get_color_by_type(PieceType type)
 {
     switch (type) {
-	case PIECE_I: return CYAN;
-	case PIECE_O: return YELLOW;
-	case PIECE_T: return MAGENTA;
-	case PIECE_S: return GREEN;
-	case PIECE_Z: return RED;
-	case PIECE_J: return BLUE;
-	case PIECE_L: return WHITE;
-	case NONE: default: return 0;
+        case PIECE_I: return CYAN;
+        case PIECE_O: return YELLOW;
+        case PIECE_T: return MAGENTA;
+        case PIECE_S: return GREEN;
+        case PIECE_Z: return RED;
+        case PIECE_J: return BLUE;
+        case PIECE_L: return WHITE;
+        case NONE: default: return 0;
     }
 }
 
@@ -106,26 +106,26 @@ static void compose_frame(const Cell board[HEIGHT][WIDTH], const ActivePiece *pi
 {
     // copy board to frame
     for (int y = 0; y < HEIGHT; y++) {
-	for (int x = 0; x < WIDTH; x++)  {
-	    frame[y][x] = board[y][x];
-	}
+        for (int x = 0; x < WIDTH; x++)  {
+            frame[y][x] = board[y][x];
+        }
     }
     uint16_t shape = PIECE_SHAPES[piece->type][piece->rotation];
     // copy active piece to frame
     for (int r = 0; r < 4; r++) {
-	for (int c = 0; c < 4; c++) {
-	    if (1 & (shape >> (15 - (r * 4 + c)))) {
-		frame[piece->pos.y + r][piece->pos.x + c] = piece->type;
-	    }
-	}
+        for (int c = 0; c < 4; c++) {
+            if (1 & (shape >> (15 - (r * 4 + c)))) {
+                frame[piece->pos.y + r][piece->pos.x + c] = piece->type;
+            }
+        }
     }
 }
 
 static void render_cell(Cell cell) {
     if (cell == 0)
-	printf("  ");
+        printf("  ");
     else
-	printf("[]");
+        printf("[]");
 }
 
 static void render_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *piece)
@@ -134,19 +134,19 @@ static void render_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *pie
     compose_frame(board, piece, temp_buffer);
 
     for (int y = 0; y < HEIGHT; y++) {
-	for (int x = 0; x < WIDTH; x++) {
+        for (int x = 0; x < WIDTH; x++) {
 
-	    Cell current = temp_buffer[y][x];
+            Cell current = temp_buffer[y][x];
 
-	    if (current != shadow_buffer[y][x]) {
-		// for each x in board there is 2 chars in output
-		move_cursor(OFFSET_X + x*2, OFFSET_Y + y);
-		set_fg_color(get_color_by_type(current));
-		set_bg_color(BLACK);
-		render_cell(current);
-		shadow_buffer[y][x] = current;
-	    }
-	}
+            if (current != shadow_buffer[y][x]) {
+                // for each x in board there is 2 chars in output
+                move_cursor(OFFSET_X + x*2, OFFSET_Y + y);
+                set_fg_color(get_color_by_type(current));
+                set_bg_color(BLACK);
+                render_cell(current);
+                shadow_buffer[y][x] = current;
+            }
+        }
     }
     fflush(stdout);
 }
@@ -154,20 +154,20 @@ static void render_board(const Cell board[HEIGHT][WIDTH], const ActivePiece *pie
 static void render_outline()
 {
     for (int x = 0; x < WIDTH*2; x++) {
-	// top
-	move_cursor(OFFSET_X + x, OFFSET_Y - 1);
-	printf("_");
-	// bottom
-	move_cursor(OFFSET_X + x, OFFSET_Y + HEIGHT);
-	printf("-");
+        // top
+        move_cursor(OFFSET_X + x, OFFSET_Y - 1);
+        printf("_");
+        // bottom
+        move_cursor(OFFSET_X + x, OFFSET_Y + HEIGHT);
+        printf("-");
     }
     for (int y = 0; y < HEIGHT; y++) {
-	// left side
-	move_cursor(OFFSET_X - 1, OFFSET_Y + y);
-	printf("|");
-	// right side
-	move_cursor(OFFSET_X + WIDTH*2, OFFSET_Y + y);
-	printf("|");
+        // left side
+        move_cursor(OFFSET_X - 1, OFFSET_Y + y);
+        printf("|");
+        // right side
+        move_cursor(OFFSET_X + WIDTH*2, OFFSET_Y + y);
+        printf("|");
     }
     fflush(stdout);
 }

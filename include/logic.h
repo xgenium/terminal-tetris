@@ -5,7 +5,7 @@
 #define SRS_KICK_TESTS 5
 
 #define DEFAULT_TICK 500       // 500 ms
-#define MIN_TICK 30	      // 30 ms
+#define MIN_TICK 30           // 30 ms
 #define TICKS_PER_LEVEL 40
 
 #define LINES_PER_LEVEL 10

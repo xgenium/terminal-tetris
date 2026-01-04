@@ -10,11 +10,11 @@ int main(int argc, char *argv[])
     GameState state = init_game();
 
     if (argc == 2) {
-	int lvl = atoi(argv[1]);
-	if (lvl >= 1 && lvl <= 10) {
-	    state.level = lvl;
-	    state.total_lines_cleared = (lvl - 1) * LINES_PER_LEVEL;
-	}
+        int lvl = atoi(argv[1]);
+        if (lvl >= 1 && lvl <= 10) {
+            state.level = lvl;
+            state.total_lines_cleared = (lvl - 1) * LINES_PER_LEVEL;
+        }
     }
 
     main_loop(&state);

@@ -64,20 +64,20 @@ static void init_signal_handler()
 static void apply_input(GameState *state, InputType input)
 {
     switch (input) {
-	case LEFT:
-	    move_piece_horizontal(state->board, &state->piece, -1);
-	    break;
-	case RIGHT:
-	    move_piece_horizontal(state->board, &state->piece, 1);
-	    break;
-	case DOWN:
-	    state->tick = MIN_TICK;
-	    break;
-	case ROTATE:
-	    rotate_piece(state->board, &state->piece);
-	    break;
-	case UNKNOWN: default:
-	    break;
+        case LEFT:
+            move_piece_horizontal(state->board, &state->piece, -1);
+            break;
+        case RIGHT:
+            move_piece_horizontal(state->board, &state->piece, 1);
+            break;
+        case DOWN:
+            state->tick = MIN_TICK;
+            break;
+        case ROTATE:
+            rotate_piece(state->board, &state->piece);
+            break;
+        case UNKNOWN: default:
+            break;
     }
 }
 
@@ -88,10 +88,10 @@ void process_movement(GameState *state)
     state->tick = get_tick_by_level(state->level);
 
     for (int shift = 0; shift < MOVEMENT_COUNT; shift++) {
-	InputType type = 1<<shift;
-	if (state->pressed_keys & type) {
-	    apply_input(state, type);
-	}
+        InputType type = 1<<shift;
+        if (state->pressed_keys & type) {
+            apply_input(state, type);
+        }
     }
     // reset all pressed keys
     state->pressed_keys = 0;
@@ -103,13 +103,13 @@ void handle_input(GameState *state)
     unsigned char buf[INPUT_BUF_SIZE];
     int n;
     while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
-	int parsed_bytes = 0;
-	// Parse multiple keys
-	for (int i = 0; i < n; i += parsed_bytes) {
-	    InputType type;
-	    parsed_bytes = parse_input(&buf[i], &type);
-	    state->pressed_keys |= type;
-	}
+        int parsed_bytes = 0;
+        // Parse multiple keys
+        for (int i = 0; i < n; i += parsed_bytes) {
+            InputType type;
+            parsed_bytes = parse_input(&buf[i], &type);
+            state->pressed_keys |= type;
+        }
     }
 }
 
@@ -123,21 +123,21 @@ void main_loop(GameState *state)
     clock_t last_time = get_time_ms();
 
     while (!state->game_over) {
-	clock_t current_time = get_time_ms();
+        clock_t current_time = get_time_ms();
 
-	handle_input(state);
-	process_movement(state);
+        handle_input(state);
+        process_movement(state);
 
-	if (current_time - last_time >= state->tick) {
-	    int8_t lines_cleared = game_tick(state);
-	    if (lines_cleared > 0) {
-		state->total_lines_cleared += lines_cleared;
-		handle_leveling(state);
-	    }
-	    last_time = current_time;
-	}
+        if (current_time - last_time >= state->tick) {
+            int8_t lines_cleared = game_tick(state);
+            if (lines_cleared > 0) {
+                state->total_lines_cleared += lines_cleared;
+                handle_leveling(state);
+            }
+            last_time = current_time;
+        }
 
-	render_game(state);
-	usleep(MS_TO_MICROS(FRAMERATE_CAP));
+        render_game(state);
+        usleep(MS_TO_MICROS(FRAMERATE_CAP));
     }
 }
