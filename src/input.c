@@ -7,7 +7,8 @@
 #endif
 
 #ifdef _WIN32
-DWORD oldDwMode;
+static DWORD oldDwMode;
+static COMMTIMEOUTS oldTimeouts;
 #else
 static struct termios oldt;
 #endif
@@ -18,12 +19,23 @@ static InputType parse_usual_key(unsigned char k);
 void init_input()
 {
 #ifdef _WIN32
+    // Enable non cannonical mode and disable echo
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     DWORD dwMode = 0;
     GetConsoleMode(hIn, &oldDwMode);
     dwMode = oldDwMode;
     dwMode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
     SetConsoleMode(hIn, dwMode);
+    // Enable non blocking input
+    COMMTIMEOUTS newTimeouts;
+    GetCommTimeouts(hIn, &oldTimeouts);
+
+    newTimeouts = oldTimeouts;
+    newTimeouts.ReadIntervalTimeout = MAXDWORD;
+    newTimeouts.ReadTotalTimeoutMultiplier = 0;
+    newTimeouts.ReadTotalTimeoutConstant = 0;
+
+    SetCommTimeouts(hIn, &newTimeouts);
 #else
     struct termios newt;
     tcgetattr(STDIN_FILENO, &oldt);
@@ -76,6 +88,7 @@ void reset_input()
 #ifdef _WIN32
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     SetConsoleMode(hIn, oldDwMode);
+    SetCommTimeouts(hIn, &oldTimeouts);
 #else
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 #endif

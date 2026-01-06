@@ -3,10 +3,22 @@
 #include "../include/render.h"
 #include "../include/input.h"
 #include <stdint.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#define read _read
+#else
 #include <unistd.h>
+#endif
+
+#ifndef _WIN32
 #include <signal.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
+
 
 static uint16_t get_tick_by_level(int8_t level);
 #ifndef _WIN32
@@ -147,6 +159,10 @@ void main_loop(GameState *state)
         }
 
         render_game(state);
+#ifdef _WIN32
+        Sleep(FRAMERATE_CAP);
+#else
         usleep(MS_TO_MICROS(FRAMERATE_CAP));
+#endif
     }
 }
