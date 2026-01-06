@@ -2,6 +2,11 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+#include <windows.h>
+static DWORD oldDwMode;
+#endif
+
 static Cell shadow_buffer[HEIGHT][WIDTH];
 
 static void clear_screen();
@@ -34,6 +39,13 @@ static void init_shadow_buffer()
 
 void init_render()
 {
+#ifdef _WIN32
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleMode(hOut, &oldDwMode);
+    DWORD dwMode = oldDwMode;
+    SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+#endif
+
     clear_screen();
     hide_cursor();
     set_color_mode();
