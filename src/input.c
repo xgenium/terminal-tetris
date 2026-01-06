@@ -1,14 +1,30 @@
 #include "../include/input.h"
-#include <termios.h>
-#include <unistd.h>
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <termios.h>
+    #include <unistd.h>
+#endif
 
+#ifdef _WIN32
+DWORD oldDwMode;
+#else
 static struct termios oldt;
+#endif
 
 static InputType parse_arrow_key(unsigned char buf[ARROW_KEY_SIZE]);
 static InputType parse_usual_key(unsigned char k);
 
 void init_input()
 {
+#ifdef _WIN32
+    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD dwMode = 0;
+    GetConsoleMode(hIn, &oldDwMode);
+    dwMode = oldDwMode;
+    dwMode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
+    SetConsoleMode(hIn, dwMode);
+#else
     struct termios newt;
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
@@ -16,6 +32,7 @@ void init_input()
     newt.c_cc[VMIN] = 0;
     newt.c_cc[VTIME] = 0;
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+#endif
 }
 
 // Parse buf into known input types and return amount of parse bytes
@@ -56,5 +73,10 @@ static InputType parse_usual_key(unsigned char k)
 
 void reset_input()
 {
+#ifdef _WIN32
+    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+    SetConsoleMode(hIn, oldDwMode);
+#else
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+#endif
 }

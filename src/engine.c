@@ -9,8 +9,10 @@
 #include <stdio.h>
 
 static uint16_t get_tick_by_level(int8_t level);
+#ifndef _WIN32
 static void sigint_handler(int sig);
 static void init_signal_handler();
+#endif
 static void apply_input(GameState *state, InputType input);
 
 static uint16_t get_tick_by_level(int8_t level)
@@ -25,6 +27,18 @@ clock_t get_time_ms()
     return S_TO_MS(tp.tv_sec) + NS_TO_MS(tp.tv_nsec);
 }
 
+// TODO: Add signal handler for windows
+#ifndef _WIN32
+
+// Initialize all signal handlers
+// (use this function in higher lvl function like init_game)
+static void init_signal_handler()
+{
+    struct sigaction sa;
+    sa.sa_handler = &sigint_handler;
+    sigaction(SIGINT, &sa, NULL);
+}
+
 // Reset colors, show and move cursor to normal position
 // (makes life easier if ctrl c was pressed)
 static void sigint_handler(int sig)
@@ -32,6 +46,8 @@ static void sigint_handler(int sig)
     reset_all();
     exit(sig);
 }
+
+#endif
 
 void reset_all()
 {
@@ -42,23 +58,16 @@ void reset_all()
 // Initialize everything and spawn a piece
 GameState init_game()
 {
+#ifndef _WIN32
     init_signal_handler();
-    srandom(time(NULL));
+#endif
+    srand(time(NULL));
     init_render();
     init_input();
     // ... add input init
     GameState state = init_gamestate();
     spawn_piece(state.board, &state.piece, get_random_piece_type());
     return state;
-}
-
-// Initialize all signal handlers
-// (use this function in higher lvl function like init_game)
-static void init_signal_handler()
-{
-    struct sigaction sa;
-    sa.sa_handler = &sigint_handler;
-    sigaction(SIGINT, &sa, NULL);
 }
 
 static void apply_input(GameState *state, InputType input)

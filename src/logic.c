@@ -257,7 +257,7 @@ int get_transition_index(RotationType old_rot, RotationType new_rot)
 
 PieceType get_random_piece_type()
 {
-    return (random() % (PIECE_COUNT - 1)) + 1;
+    return (rand() % (PIECE_COUNT - 1)) + 1;
 }
 
 int8_t get_level_by_lines_cleared(int lines_cleared)
